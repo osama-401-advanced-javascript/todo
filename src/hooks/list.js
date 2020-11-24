@@ -1,5 +1,3 @@
-import React from 'react';
-
 function useList(handler, todoAPI, setList, list) {
   const toggleComplete = (id) => {
     let item = list.filter((i) => i._id === id)[0] || {};

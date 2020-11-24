@@ -14,7 +14,7 @@ function ToDo() {
 
   useEffect(() => {
     loader();
-  }, []);
+  });
 
   useEffect(() => {
     document.title = `To Do List: ${list.filter((item) => !item.complete).length}`;

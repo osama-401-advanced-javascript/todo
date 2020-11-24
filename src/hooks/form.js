@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 const todoAPI = 'https://zatar-api-server.herokuapp.com/api/v1/todo';
 
