@@ -1,0 +1,23 @@
+body {
+    background-color: #e6739f;
+}
+
+.custom-range::-webkit-slider-thumb {
+    background-color: #790c5a;
+}
+.custom-range::-webkit-slider-thumb:active {
+    background-color: #e6739f;
+}
+.custom-range::-moz-range-thumb {
+    background-color: #790c5a;
+}
+
+.custom-range::-moz-range-thumb:active {
+    background-color: #e6739f;
+}
+.custom-range::-ms-thumb {
+    background-color: #790c5a;
+}
+.custom-range::-ms-thumb:active {
+    background-color: #e6739f;
+}
