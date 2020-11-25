@@ -1,82 +1,61 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import TodoForm from './form.js';
 import TodoList from './list.js';
-
+import Row from 'react-bootstrap/Row';
+import Container from 'react-bootstrap/Container';
+import Col from 'react-bootstrap/Col';
+import Badge from 'react-bootstrap/Badge';
+import Spinner from 'react-bootstrap/Spinner';
 import './todo.scss';
+import useAjax from '../../hooks/useAjax';
+import Auth from '../../auth/auth';
 
 const todoAPI = 'https://api-js401.herokuapp.com/api/v1/todo';
 
 const ToDo = () => {
-  const [list, setList] = useState([]);
-
-  const _addItem = (item) => {
-    item.due = new Date();
-    fetch(todoAPI, {
-      method: 'post',
-      mode: 'cors',
-      cache: 'no-cache',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(item),
-    })
-      .then((response) => response.json())
-      .then((savedItem) => {
-        setList([...list, savedItem]);
-      })
-      .catch(console.error);
-  };
-
-  const _toggleComplete = (id) => {
-    let item = list.filter((i) => i._id === id)[0] || {};
-
-    if (item._id) {
-      item.complete = !item.complete;
-
-      let url = `${todoAPI}/${id}`;
-
-      fetch(url, {
-        method: 'put',
-        mode: 'cors',
-        cache: 'no-cache',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(item),
-      })
-        .then((response) => response.json())
-        .then((savedItem) => {
-          setList(list.map((listItem) => (listItem._id === item._id ? savedItem : listItem)));
-        })
-        .catch(console.error);
-    }
-  };
-
-  const _getTodoItems = () => {
-    fetch(todoAPI, {
-      method: 'get',
-      mode: 'cors',
-    })
-      .then((data) => data.json())
-      .then((data) => setList(data.results))
-      .catch(console.error);
-  };
-
-  useEffect(_getTodoItems, []);
+  const [list, isLoading, addItem, toggleComplete, deleteItem] = useAjax(todoAPI);
 
   return (
     <>
-      <header>
-        <h2>There are {list.filter((item) => !item.complete).length} Items To Complete</h2>
-      </header>
-
+      <Container>
+        <Row>
+          <Col></Col>
+        </Row>
+      </Container>
       <section className='todo'>
-        <div>
-          <TodoForm handleSubmit={_addItem} />
-        </div>
-
-        <div>
-          <TodoList list={list} handleComplete={_toggleComplete} />
-        </div>
+        <Container className='board-color'>
+          <Row className=' p-3 mb-3 bg-dark text-white '>
+            <Col xs={10}>
+              <h2>
+                There are{' '}
+                <Badge pill variant={list.filter((item) => !item.complete).length ? 'success' : 'danger'}>
+                  {' '}
+                  {list.filter((item) => !item.complete).length}{' '}
+                </Badge>{' '}
+                Items To Complete
+              </h2>
+            </Col>
+            {isLoading ? (
+              <Col>
+                <Spinner animation='border' role='status'>
+                  <span className='sr-only'>Loading...</span>
+                </Spinner>
+              </Col>
+            ) : null}
+          </Row>
+          <Row className='pl-3 pr-3'>
+            <Col md={4} className='p-sm-0'>
+              <Auth action='create'>
+                <TodoForm handleSubmit={addItem} />
+              </Auth>
+            </Col>
+            <Col md={8} className='justify-content-center p-sm-0 pl-md-5'>
+              <TodoList list={list} handleComplete={toggleComplete} handleDelete={deleteItem} />
+            </Col>
+          </Row>
+        </Container>
       </section>
     </>
   );
 };
-
 export default ToDo;

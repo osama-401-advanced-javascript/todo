@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
+import localStorageHook from '../hooks/useLocalStorage';
 
 export const SettingsContext = React.createContext();
-
+const defaultPreference = {
+  numberOfItems: '3',
+  completedTasks: 'true',
+  sort: 'descending',
+};
 function SettingsProvider(props) {
-  const [numberOfItems, setValue] = useState('3');
-  const [completedTasks, setComplete] = useState(true);
-  const [sort, setSort] = useState('descending');
-
+  // as a state : title, twitter
+  const { value, handleChange, handleSubmit } = localStorageHook('preferences', { ...defaultPreference });
   const state = {
-    numberOfItems,
-    completedTasks,
-    sort,
-    setValue,
-    setComplete,
-    setSort,
+    value,
+    handleChange,
+    handleSubmit,
   };
 
   return <SettingsContext.Provider value={state}>{props.children}</SettingsContext.Provider>;

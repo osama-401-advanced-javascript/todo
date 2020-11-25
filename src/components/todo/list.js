@@ -1,75 +1,68 @@
-import React, { useContext, useState } from 'react';
-import { SettingsContext } from '../../context/settings.js';
-
-import { ListGroup, Button, CloseButton, Container, Row, Col } from 'react-bootstrap';
+import React, { useContext, useState, useEffect } from 'react';
+import Button from 'react-bootstrap/Button';
+import Row from 'react-bootstrap/Row';
+import Container from 'react-bootstrap/Container';
+import ListItems from './listItems';
+import { SettingsContext } from '../../context/settings';
 
 function TodoList(props) {
-  const [itemsPerScreen, setItems] = useState([]);
-  const context = useContext(SettingsContext);
-
-  props.list.sort(function (a, b) {
-    if (a.difficulty < b.difficulty) {
-      return -1;
+  const settingsContext = useContext(SettingsContext);
+  const [render, setRender] = useState({ numberOfPagesArr: [], listArr: [] });
+  const [shownItems, setShownItems] = useState({ listArr: [] });
+  useEffect(() => {
+    return () => {
+      console.log('******************* UNMOUNTED');
+    };
+  }, []);
+  useEffect(() => {
+    let settings = { ...settingsContext.value };
+    let listArr = [...props.list];
+    if (settings.completedTasks === 'false')
+      listArr = [
+        ...listArr.filter((val) => {
+          return !val.complete;
+        }),
+      ];
+    listArr.sort((a, b) => b.difficulty - a.difficulty);
+    if (settings.sort !== 'descending') listArr.reverse();
+    let numberOfPages = Math.ceil(listArr.length / Number(settings.numberOfItems));
+    let numberOfPagesArr = [];
+    for (let i = 0; i < numberOfPages; i++) {
+      numberOfPagesArr[i] = i;
     }
-    if (a.difficulty > b.difficulty) {
-      return 1;
+    setRender({ numberOfPagesArr, listArr });
+    let limitedListArr = [];
+    for (let i = 0; i < listArr.length && i < Number(settings.numberOfItems); i++) {
+      limitedListArr[i] = listArr[i];
     }
-    return 0;
-  });
-  let numberOfPages = Math.ceil(props.list.length / 3);
-  let numberOfPagesArr = [];
-  for (let i = 0; i < numberOfPages; i++) {
-    numberOfPagesArr[i] = i;
-  }
-
-  let limitedListArr = [];
-  for (let i = 0; i < props.list.length && i < Number(context.numberOfItems); i++) {
-    limitedListArr[i] = props.list[i];
-  }
+    setShownItems({ listArr: limitedListArr });
+  }, [props.list, settingsContext]);
   function _handleOnClick(event) {
     let limitedListArr = [];
-
-    for (let i = 0, j = (event.target.value - 1) * Number(context.numberOfItems); props.list.length - j && i < Number(context.numberOfItems); j++, i++) {
-      limitedListArr[i] = props.list[j];
+    for (let i = 0; i < document.getElementsByClassName('itemsListGroup').length; i++) {
+      document.getElementsByClassName('itemsListGroup')[i].innerHTML = '';
     }
-    console.log(limitedListArr);
-    setItems(limitedListArr);
-  }
+    for (let i = 0, j = (event.target.value - 1) * Number(settingsContext.value.numberOfItems); render.listArr.length - j && i < Number(settingsContext.value.numberOfItems); j++, i++) {
+      limitedListArr[i] = render.listArr[j];
+    }
 
+    console.log('limitedListArr>>>>>>>.', limitedListArr);
+    setShownItems({ listArr: limitedListArr });
+  }
   return (
-    <ListGroup>
-      {itemsPerScreen.map((item) => (
-        <Container key={item._id}>
-          <Row>
-            <Col sm={6}>
-              <ListGroup.Item style={{ padding: '5px', marginTop: '15px' }} variant='dark'>
-                Assigned to: <strong>{item.assignee}</strong> | Difficulty: <strong>{item.difficulty}</strong>{' '}
-              </ListGroup.Item>
-            </Col>
-            <Col sm={5}></Col>
-            <CloseButton onClick={() => props.handleDelete(item._id)} />
-          </Row>
-          <Row>
-            <Col sm={12}>
-              <ListGroup.Item onClick={() => props.handleComplete(item._id)} variant={item.complete ? 'success' : 'danger'}>
-                {item.text}
-              </ListGroup.Item>
-            </Col>
-          </Row>
-        </Container>
-      ))}
+    <>
+      {<ListItems listArr={shownItems} handlers={{ handleComplete: props.handleComplete, handleDelete: props.handleDelete }} />}
       <Container>
         <Row>
-          {numberOfPagesArr.map((val, indx) => (
-            <Button onClick={_handleOnClick} className='m-2' id={`${indx + 1}`} value={indx + 1} key={indx + 1}>
+          {render.numberOfPagesArr.map((val, indx) => (
+            <Button onClick={_handleOnClick} className='m-2' value={indx + 1} key={indx + 1}>
               {' '}
               {indx + 1}
             </Button>
           ))}
         </Row>
       </Container>
-    </ListGroup>
+    </>
   );
 }
-
 export default TodoList;
