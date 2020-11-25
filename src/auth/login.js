@@ -1,6 +1,7 @@
 import React from 'react';
 import { AuthContext } from './context.js';
 import Show from '../show/show';
+import { Navbar, Button, Form, FormControl } from 'react-bootstrap';
 
 class Login extends React.Component {
   static contextType = AuthContext;
@@ -39,41 +40,41 @@ class Login extends React.Component {
 
     return (
       <>
-        <Show condition={this.context.loggedIn}>
-          <button onClick={this._handleLogout}>Logout</button>
-        </Show>
-        <Show condition={!this.context.loggedIn}>
-          <form onSubmit={this.handleSigningSubmit}>
-            <input onChange={this.handleChange} required placeholder='username' name='username' />
-            <input onChange={this.handleChange} required placeholder='password' name='password' />
-            <button>Login</button>
-          </form>
-        </Show>
-        <Show condition={!this.context.loggedIn}>
-          <form onSubmit={this.handleSignupSubmit}>
-            <label>
-              {' '}
-              <span> Username </span>
-              <input onChange={this.handleChange} required placeholder='username' name='username' />
-            </label>
-            <label>
-              {' '}
-              <span> Password </span>
-              <input onChange={this.handleChange} required placeholder='password' name='password' />
-            </label>
-            <label>
-              {' '}
+        <Navbar bg='primary' variant='dark'>
+          <Show condition={this.context.loggedIn}>
+            <Button onClick={this._handleLogout} variant='outline-light'>
+              Logout
+            </Button>
+          </Show>
+
+          <Show condition={!this.context.loggedIn}>
+            <Form onSubmit={this.handleSigningSubmit} inline>
+              <FormControl onChange={this.handleChange} type='text' required placeholder='usernsme' name='username' className='mr-sm-2' />
+              <FormControl onChange={this.handleChange} type='text' required placeholder='password' name='password' className='mr-sm-2' />
+              <Button type='submit' variant='outline-light'>
+                Login
+              </Button>
+            </Form>
+          </Show>
+        </Navbar>
+        <Navbar bg='primary' variant='dark'>
+          <Show condition={!this.context.loggedIn}>
+            <Form onSubmit={this.handleSignupSubmit} inline>
+              <FormControl onChange={this.handleChange} type='text' required placeholder='usernsme' name='username' className='mr-sm-2' />
+              <FormControl onChange={this.handleChange} type='text' required placeholder='password' name='password' className='mr-sm-2' />
               <span> Role </span>
               <select onChange={this.handleChange} name='role'>
                 <option value='admin'>admin</option>
                 <option value='editor'>editor</option>
-                <option value='writer'>writer</option>
                 <option value='user'>user</option>
               </select>
-            </label>
-            <button> sign-up</button>
-          </form>
-        </Show>
+
+              <Button type='submit' variant='outline-light'>
+                sign-up
+              </Button>
+            </Form>
+          </Show>
+        </Navbar>
       </>
     );
   }
